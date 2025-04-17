@@ -6,24 +6,108 @@ servers:
   - url: https://{url}
     variables:
       url:
-        default: organic-space-fiesta-7j9qp7jjvvx3rwxx-3001.app.github.dev
+        default: solid-enigma-6xg64vx7x6vc559v-3001.app.github.dev
 paths:
-  /v1/users/list:
+  /v1/users/active:
     get:
-      description: List all users in the GBC Library database
+      description: List all active users
       responses:
         "200":
           description: OK
-  /v1/users/get:
-    get:
-      description: Fetch a specifict user in the GBC Library database
-      parameters:
-        - name: id
-          in: query
-          description: ID of user
+
+  /v1/movies/genre:
+   get:
+    description: Get movies by genre
+    parameters:
+      - name: genre
+        in: query
+        required: true
+        schema:
+          type: string
+    responses:
+      "200":
+        description: List of movies matching the genre
+        
+  /v1/ratings/get:
+   get:
+    description: Get ratings for a specific movie
+    parameters:
+      - name: movie_id
+        in: query
+        description: ID of the movie
+        schema:
+          type: number
+    responses:
+      "200":
+        description: OK
+
+  /v1/users/deactivate:
+   patch:
+    description: Deactivate a user in the GBC Library database
+    parameters:
+      - name: id
+        in: query
+        description: ID of the user to deactivate
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: User successfully deactivated
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: success
+                message:
+                  type: string
+                  example: User with ID 5 has been deactivated
+      "500":
+        description: Server error
+
+  /v1/users/activate:
+   patch:
+    description: Activate a user account
+    parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: integer
+    responses:
+      "200":
+        description: User activated successfully
+      "404":
+        description: User not found
+      "500":
+        description: Server error  
+
+  /v1/users/create:
+   post:
+    description: Create a new user account
+    requestBody:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
           schema:
-            type: number
-      responses:
-        "200":
-          description: OK
+            type: object
+            properties:
+              user_name:
+                type: string             
+              email:
+                type: string
+              password:
+                type: string
+    responses:
+      "201":
+        description: User created successfully
+      "500":
+        description: Server error
+
+
+
+
 
