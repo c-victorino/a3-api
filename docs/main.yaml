@@ -8,106 +8,284 @@ servers:
       url:
         default: solid-enigma-6xg64vx7x6vc559v-3001.app.github.dev
 paths:
-  /v1/users/active:
+  /movies/search:
     get:
-      description: List all active users
+      summary: Search for movies by title
+      description: Returns a list of movies matching the search keyword in the title. Includes title, year, duration, summary, and category.
+      tags:
+        - Movies
+      parameters:
+        - name: title
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         "200":
-          description: OK
+          description: Movies found successfully
+        "404":
+          description: No movies found
+        "500":
+          description: Server error
 
-  /v1/movies/genre:
-   get:
-    description: Get movies by genre
-    parameters:
-      - name: genre
-        in: query
-        required: true
-        schema:
-          type: string
-    responses:
-      "200":
-        description: List of movies matching the genre
-        
-  /v1/ratings/get:
-   get:
-    description: Get ratings for a specific movie
-    parameters:
-      - name: movie_id
-        in: query
-        description: ID of the movie
-        schema:
-          type: number
-    responses:
-      "200":
-        description: OK
+  /movies/by-genre:
+    get:
+      summary: Get movies by genre keyword
+      description: Fetches movies that match the given genre keyword.
+      tags:
+        - Movies
+      parameters:
+        - name: name
+          in: query
+          required: true
+          description: The keyword for the genre (e.g., "action", "comedy", etc.)
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A list of movies matching the genre keyword
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        title:
+                          type: string
+                        release_year:
+                          type: integer
+                        duration:
+                          type: integer
+                        summary:
+                          type: string
+                        category:
+                          type: string
+        "404":
+          description: No movies found for this genre keyword
+        "500":
+          description: Server error
 
-  /v1/users/deactivate:
-   patch:
-    description: Deactivate a user in the GBC Library database
-    parameters:
-      - name: id
-        in: query
-        description: ID of the user to deactivate
+  /movies:
+    get:
+      summary: Get all movies
+      description: Retrieves a list of all movies including title, release year, duration, summary, and category.
+      tags:
+        - Movies
+      responses:
+        "200":
+          description: A list of movies
+        "500":
+          description: Server error
+
+  # User Management & Administration
+  /users/deactivate:
+    patch:
+      summary: Deactivate a user account
+      description: Deactivates a user account using a query parameter `id`.
+      tags:
+        - User Management & Administration
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User deactivated successfully
+        "404":
+          description: User not found
+        "500":
+          description: Server error
+
+  /users/activate:
+    patch:
+      summary: Activate a user account
+      description: Activates a user account using a query parameter `id`.
+      tags:
+        - User Management & Administration
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: User activated successfully
+        "404":
+          description: User not found
+        "500":
+          description: Server error
+
+  /users/create:
+    post:
+      summary: Create a new user account
+      description: Creates a new user with a unique username and email address.
+      tags:
+        - User Management & Administration
+      requestBody:
         required: true
-        schema:
-          type: integer
-    responses:
-      "200":
-        description: User successfully deactivated
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               type: object
               properties:
-                status:
+                user_name:
                   type: string
-                  example: success
-                message:
+                email:
                   type: string
-                  example: User with ID 5 has been deactivated
-      "500":
-        description: Server error
+                password:
+                  type: string
+      responses:
+        "201":
+          description: User created successfully
+        "500":
+          description: Server error
 
-  /v1/users/activate:
-   patch:
-    description: Activate a user account
-    parameters:
-      - name: id
-        in: query
-        required: true
-        schema:
-          type: integer
-    responses:
-      "200":
-        description: User activated successfully
-      "404":
-        description: User not found
-      "500":
-        description: Server error  
+  /users:
+    get:
+      summary: Get all users
+      description: Retrieves a list of all registered users.
+      tags:
+        - User Management & Administration
+      responses:
+        "200":
+          description: A list of users
+        "500":
+          description: Server error
 
-  /v1/users/create:
-   post:
-    description: Create a new user account
-    requestBody:
-      required: true
-      content:
-        application/x-www-form-urlencoded:
+  # Search & Filter Options
+  /movies/ratings:
+    get:
+      description: Get movies with an average rating above the specified value (scale 0-5), including genre, category, and the number of users who rated it.
+      tags:
+        - Search & Filter Options
+      parameters:
+        - name: rating
+          in: query
+          description: Minimum average rating to filter movies by (required). Rating scale is 0-5.
+          required: true
           schema:
-            type: object
-            properties:
-              user_name:
-                type: string             
-              email:
-                type: string
-              password:
-                type: string
-    responses:
-      "201":
-        description: User created successfully
-      "500":
-        description: Server error
+            type: number
+            format: float
+            minimum: 0
+            maximum: 5
+      responses:
+        "200":
+          description: Movies with average ratings greater than or equal to the specified value, including genre, category, and the number of ratings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        movie_id:
+                          type: integer
+                        title:
+                          type: string
+                        average_rating:
+                          type: number
+                          format: float
+                        user_count:
+                          type: integer
+                        genres:
+                          type: string
+                        category:
+                          type: string
+        "400":
+          description: Rating query parameter is missing, invalid, or out of range (0-5 scale)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: "Rating query parameter is required or out of range."
+        "404":
+          description: No movies found with the specified rating
+        "500":
+          description: Server error
 
-
-
-
-
+  /directors/search:
+    get:
+      description: Search directors by keyword in their name and list the movies they have worked on.
+      tags:
+        - Search & Filter Options
+      parameters:
+        - name: keyword
+          in: query
+          description: Keyword to search for in the director's first or last name.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: A list of directors matching the search keyword with the movies they worked on.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        director_id:
+                          type: integer
+                        f_name:
+                          type: string
+                        l_name:
+                          type: string
+                        movie_title:
+                          type: string
+        "400":
+          description: Keyword query parameter is missing.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Keyword is required
+        "404":
+          description: No directors found matching the keyword.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: No directors found
+        "500":
+          description: Server error.
