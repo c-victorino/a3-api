@@ -1,12 +1,6 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/1bry_Q4E)
-# desn3038-w25-eb
+# desn3038-w25
 
-## Database credentials
-
-- Hostname: `gbc.goodcodeclub.com`
-- Username: `w25_{STUDENTID}`, where `{STUDENTID}` is your student ID (ex. `w25_101010101`)
-- Password: `w25_{STUDENTID}`
-- Database: `w25_{STUDENTID}_e4` (note `_e4` at the end)
+# Assignment #3: API endpoints and documentation
 
 ## Checklist / before you begin
 
@@ -26,5 +20,3 @@ nodemon backend/main.js
 ```
 
 Thereafter, click on "Make Public" or use the "Ports" tab.
-
-Have fun!
