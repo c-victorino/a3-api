@@ -1,6 +1,6 @@
 openapi: "3.1.1"
 info:
-  title: GBC Library
+  title: Movie Catalog Application
   version: "1.0"
 servers:
   - url: https://{url}
@@ -8,6 +8,7 @@ servers:
       url:
         default: solid-enigma-6xg64vx7x6vc559v-3001.app.github.dev
 paths:
+  # Search
   /movies/search:
     get:
       summary: Search for movies by title
